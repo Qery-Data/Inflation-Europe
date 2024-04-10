@@ -198,6 +198,58 @@ df = dataset.write('dataframe')
 df_new = df.pivot(index='konsumgruppe', columns='måned', values='value')
 df_new.to_csv('data/SSB_CPI_Weights_Latest.csv', index=True)
 
+#CPI Yearly Level 2
+ssburl = 'https://data.ssb.no/api/v0/no/table/03013/'
+query = {
+  "query": [
+    {
+      "code": "Konsumgrp",
+      "selection": {
+        "filter": "vs:CoiCop2016niva2",
+        "values": [
+          "01",
+          "02",
+          "03",
+          "04",
+          "05",
+          "06",
+          "07",
+          "08",
+          "09",
+          "10",
+          "11",
+          "12"
+        ]
+      }
+    },
+    {
+      "code": "ContentsCode",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "Tolvmanedersendring"
+        ]
+      }
+    },
+    {
+      "code": "Tid",
+      "selection": {
+        "filter": "top",
+        "values": ["120"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "format": "json-stat2"
+  }
+}
+result = requests.post(ssburl, json = query)
+dataset = pyjstat.Dataset.read(result.text)
+df = dataset.write('dataframe')
+df_new = df.pivot(index='konsumgruppe', columns='måned', values='value')
+df_new.to_csv('data/SSB_CPI_Divisions_12M_Last10y.csv', index=True)
+
 #CPI Yearly Level 3
 ssburl = 'https://data.ssb.no/api/v0/no/table/03013/'
 query = {
