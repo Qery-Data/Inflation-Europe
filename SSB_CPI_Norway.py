@@ -4,7 +4,7 @@ import os
 import pandas as pd
 os.makedirs('data', exist_ok=True)
 
-#CPI Total Level 1
+#CPI Total Level 1 All Years
 ssburl = 'https://data.ssb.no/api/v0/no/table/03013/'
 query = {
   "query": [
@@ -37,7 +37,7 @@ df = dataset.write('dataframe')
 df_new = df.pivot(index='statistikkvariabel', columns='måned', values='value')
 df_new.to_csv('data/SSB_CPI_Total.csv', index=True)
 
-#CPI Yearly Change Level 2
+#CPI Yearly Change Level 2 Latest Month
 ssburl = 'https://data.ssb.no/api/v0/no/table/03013/'
 query = {
   "query": [
@@ -90,7 +90,7 @@ df = dataset.write('dataframe')
 df_new = df.pivot(index='statistikkvariabel', columns='konsumgruppe', values='value')
 df_new.to_csv('data/SSB_CPI_Divisions_12M_Latest.csv', index=True)
 
-#CPI Monthly Change Level 2
+#CPI Monthly Change Level 2 Latest Month
 ssburl = 'https://data.ssb.no/api/v0/no/table/03013/'
 query = {
   "query": [
@@ -143,7 +143,7 @@ df = dataset.write('dataframe')
 df_new = df.pivot(index='statistikkvariabel', columns='konsumgruppe', values='value')
 df_new.to_csv('data/SSB_CPI_Divisions_Monthly_Latest.csv', index=True)
 
-#CPI Weights
+#CPI Weights 1980, 2000, 2024
 ssburl = 'https://data.ssb.no/api/v0/no/table/03013/'
 query = {
   "query": [
@@ -198,7 +198,47 @@ df = dataset.write('dataframe')
 df_new = df.pivot(index='konsumgruppe', columns='måned', values='value')
 df_new.to_csv('data/SSB_CPI_Weights_Latest.csv', index=True)
 
-#CPI Yearly Level 2
+#CPI Yearly Level 1 + Level 2 Last 10 years
+ssburl = 'https://data.ssb.no/api/v0/no/table/03013/'
+query = {
+  "query": [
+    {
+      "code": "Konsumgrp",
+      "selection": {
+        "filter": "vs:CoiCop2016niva1",
+        "values": [
+          "TOTAL"
+        ]
+      }
+    },
+    {
+      "code": "ContentsCode",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "Tolvmanedersendring"
+        ]
+      }
+    },    
+    {
+      "code": "Tid",
+      "selection": {
+        "filter": "top",
+        "values": ["120"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "format": "json-stat2"
+  }
+}
+result = requests.post(ssburl, json = query)
+dataset = pyjstat.Dataset.read(result.text)
+df = dataset.write('dataframe')
+df_new_L1 = df.pivot(index='statistikkvariabel', columns='måned', values='value')
+df_new_L1.index = ['Totalindeks'] 
+
 ssburl = 'https://data.ssb.no/api/v0/no/table/03013/'
 query = {
   "query": [
@@ -247,10 +287,11 @@ query = {
 result = requests.post(ssburl, json = query)
 dataset = pyjstat.Dataset.read(result.text)
 df = dataset.write('dataframe')
-df_new = df.pivot(index='konsumgruppe', columns='måned', values='value')
-df_new.to_csv('data/SSB_CPI_Divisions_12M_Last10y.csv', index=True)
+df_new_L2 = df.pivot(index='konsumgruppe', columns='måned', values='value')
+combined_df = pd.concat([df_new_L2, df_new_L1])
+combined_df.to_csv('data/SSB_CPI_Divisions_12M_Last10y.csv', index=True)
 
-#CPI Yearly Level 3
+#CPI Yearly Level 3 Last 10 years
 ssburl = 'https://data.ssb.no/api/v0/no/table/03013/'
 query = {
   "query": [
@@ -329,7 +370,7 @@ df = dataset.write('dataframe')
 df_new = df.pivot(index='konsumgruppe', columns='måned', values='value')
 df_new.to_csv('data/SSB_CPI_Groups_12M_Last10y.csv', index=True)
 
-#CPI Yearly Level 4
+#CPI Yearly Level 4 Last 10 years
 ssburl = 'https://data.ssb.no/api/v0/no/table/03013/'
 query = {
   "query": [
@@ -463,7 +504,7 @@ df_new = df.pivot(index='konsumgruppe', columns='måned', values='value')
 df_new = df_new.dropna(subset=[df_new.columns[-1]])
 df_new.to_csv('data/SSB_CPI_Sub-Groups1_12M_Last10y.csv', index=True)
 
-#CPI Yearly Level 5
+#CPI Yearly Level 5 Last 10 years
 ssburl = 'https://data.ssb.no/api/v0/no/table/03013/'
 query = {
   "query": [
@@ -573,7 +614,7 @@ df_new = df.pivot(index='konsumgruppe', columns='måned', values='value')
 df_new = df_new.dropna(subset=[df_new.columns[-1]])
 df_new.to_csv('data/SSB_CPI_Sub-Groups2_12M_Last10y.csv', index=True)
 
-#CPI Yearly Level 6
+#CPI Yearly Level 6 Last 10 years
 ssburl = 'https://data.ssb.no/api/v0/no/table/03013/'
 query = {
   "query": [
