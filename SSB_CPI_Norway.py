@@ -237,7 +237,7 @@ result = requests.post(ssburl, json = query)
 dataset = pyjstat.Dataset.read(result.text)
 df = dataset.write('dataframe')
 df_new_L1 = df.pivot(index='statistikkvariabel', columns='måned', values='value')
-df_new_L1.index = ['Totalindeks'] 
+df_new_L1.index.name = 'konsumgruppe'
 
 ssburl = 'https://data.ssb.no/api/v0/no/table/03013/'
 query = {
@@ -288,10 +288,7 @@ result = requests.post(ssburl, json = query)
 dataset = pyjstat.Dataset.read(result.text)
 df = dataset.write('dataframe')
 df_new_L2 = df.pivot(index='konsumgruppe', columns='måned', values='value')
-df_new_L2.reset_index(inplace=True)
-df_new_L1.reset_index(inplace=True)
-combined_df = pd.concat([df_new_L2, df_new_L1], ignore_index=True)
-combined_df.rename(columns={'index': 'konsumgruppe'}, inplace=True)
+combined_df = pd.concat([df_new_L2, df_new_L1])
 combined_df.to_csv('data/SSB_CPI_Divisions_12M_Last10y.csv', index=True)
 
 #CPI Yearly Level 3 Last 10 years
