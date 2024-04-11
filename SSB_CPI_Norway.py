@@ -289,6 +289,7 @@ dataset = pyjstat.Dataset.read(result.text)
 df = dataset.write('dataframe')
 df_new_L2 = df.pivot(index='konsumgruppe', columns='måned', values='value')
 combined_df = pd.concat([df_new_L2, df_new_L1])
+combined_df.rename(columns={'index': 'konsumgruppe'}, inplace=True)
 combined_df.to_csv('data/SSB_CPI_Divisions_12M_Last10y.csv', index=True)
 
 #CPI Yearly Level 3 Last 10 years
